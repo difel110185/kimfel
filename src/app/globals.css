@@ -9,6 +9,30 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 
+  /* Corporate Blue Color Palette */
+  --primary-50: #eff6ff;
+  --primary-300: #93c5fd;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --success-50: #f0fdf4;
+  --success-600: #16a34a;
+  --success-700: #15803d;
+  --warning-50: #fffbeb;
+  --warning-600: #d97706;
+  --warning-700: #b45309;
+  --danger-50: #fef2f2;
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --neutral-50: #f9fafb;
+  --neutral-100: #f3f4f6;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
+  --neutral-700: #374151;
+
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,
     #16abff33 0deg,

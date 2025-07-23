@@ -1,0 +1,372 @@
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--neutral-200);
+  animation: slideIn 0.3s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px 16px 32px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.modalHeader h2 {
+  margin: 0;
+  color: var(--neutral-700);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--neutral-400);
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover:not(:disabled) {
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+.closeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form Styles */
+.form {
+  padding: 24px 32px 32px 32px;
+}
+
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formGroup:last-of-type {
+  margin-bottom: 32px;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  color: var(--neutral-700);
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.input, .select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--neutral-200);
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  color: var(--neutral-700);
+  transition: all 0.2s;
+  background: white;
+}
+
+.input:focus, .select:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input:disabled, .select:disabled {
+  background: var(--neutral-50);
+  color: var(--neutral-400);
+  cursor: not-allowed;
+}
+
+.charCount {
+  font-size: 12px;
+  color: var(--neutral-400);
+  margin-top: 6px;
+  text-align: right;
+}
+
+.select {
+  cursor: pointer;
+}
+
+.select option {
+  padding: 8px;
+}
+
+/* Todo Info Section */
+.todoInfo {
+  background: var(--neutral-50);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--neutral-200);
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.infoItem:last-child {
+  margin-bottom: 0;
+}
+
+.infoLabel {
+  font-weight: 600;
+  color: var(--neutral-600);
+  font-size: 13px;
+}
+
+.infoValue {
+  color: var(--neutral-500);
+  font-size: 13px;
+  font-family: ui-monospace, 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+}
+
+/* Form Actions */
+.formActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--neutral-200);
+}
+
+.cancelButton {
+  padding: 12px 24px;
+  background: var(--neutral-100);
+  color: var(--neutral-700);
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  min-width: 100px;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: var(--neutral-200);
+  border-color: var(--neutral-400);
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitButton {
+  padding: 12px 24px;
+  background: var(--primary-600);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--primary-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
+}
+
+.submitButton:disabled {
+  background: var(--neutral-300);
+  color: var(--neutral-500);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Checkbox Styles */
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary-600);
+}
+
+.checkboxLabel {
+  font-weight: 500;
+  color: var(--neutral-700);
+  cursor: pointer;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 16px;
+}
+
+.checkboxLabel:hover {
+  color: var(--primary-600);
+}
+
+/* Status Preview Section */
+.statusPreview {
+  background: var(--neutral-50);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--neutral-200);
+}
+
+.statusItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.statusItem:last-child {
+  margin-bottom: 0;
+}
+
+.statusLabel {
+  font-weight: 600;
+  color: var(--neutral-600);
+  font-size: 13px;
+}
+
+.statusValue {
+  font-weight: 600;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  text-transform: capitalize;
+}
+
+.statusValue.pending {
+  background: var(--warning-50);
+  color: var(--warning-700);
+}
+
+.statusValue.completed {
+  background: var(--success-50);
+  color: var(--success-700);
+}
+
+.statusValue.late {
+  background: var(--danger-50);
+  color: var(--danger-700);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalContent {
+    margin: 20px;
+    width: calc(100% - 40px);
+    max-width: none;
+  }
+
+  .modalHeader {
+    padding: 20px 24px 16px 24px;
+  }
+
+  .form {
+    padding: 20px 24px 24px 24px;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .cancelButton, .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
