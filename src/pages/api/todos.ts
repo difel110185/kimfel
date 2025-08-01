@@ -1,3 +1,7 @@
+// NOTE: This API route is disabled because we're using client-side Firebase authentication
+// If you need server-side API routes, they would need to be updated to handle authentication
+
+/*
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Todo, CreateTodoRequest, UpdateTodoRequest } from '../../types/todo';
 import {
@@ -120,4 +124,10 @@ async function handleDelete(req: NextApiRequest, res: NextApiResponse<ApiRespons
   }
 
   return res.status(200).json({ message: 'Todo deleted successfully' });
+}
+*/
+
+export default function handler() {
+  // API route disabled - using client-side Firebase instead
+  return { message: 'API route disabled' };
 }

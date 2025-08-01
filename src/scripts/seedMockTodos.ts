@@ -1,34 +1,51 @@
 import { createTodo } from '../lib/todoStore';
-import { TodoStatus } from '../types/todo';
 
-const mockTodoNames = [
-  'Buy groceries for the week',
-  'Schedule dentist appointment',
+const todoNames = [
   'Complete project proposal',
-  'Call mom and dad',
-  'Fix leaky faucet in kitchen',
-  'Review quarterly budget',
-  'Plan weekend hiking trip',
-  'Update resume and LinkedIn profile',
-  'Organize home office desk',
-  'Book flight tickets for vacation',
-  'Learn new programming language',
-  'Write blog post about React',
-  'Clean out email inbox',
-  'Exercise for 30 minutes',
-  'Read chapter 5 of book',
-  'Pay monthly bills online',
+  'Review quarterly reports',
+  'Schedule team meeting',
+  'Update website content',
+  'Prepare presentation slides',
+  'Review code changes',
+  'Test new features',
+  'Write documentation',
+  'Fix bug reports',
+  'Plan sprint activities',
+  'Conduct user interviews',
+  'Analyze performance metrics',
+  'Update security protocols',
   'Backup important files',
-  'Schedule car maintenance',
-  'Practice guitar for an hour',
-  'Meal prep for next week',
-  'Submit tax documents',
-  'Research new investment options',
-  'Update software on all devices',
-  'Plan birthday party for friend',
-  'Deep clean the bathroom',
-  'Organize photo collection',
-  'Learn basic Spanish phrases',
+  'Clean up workspace',
+  'Order office supplies',
+  'Schedule dental appointment',
+  'Pay monthly bills',
+  'Plan weekend activities',
+  'Call family members',
+  'Exercise routine',
+  'Grocery shopping',
+  'Read industry articles',
+  'Learn new programming language',
+  'Update LinkedIn profile',
+  'Organize digital photos',
+  'Plan vacation itinerary',
+  'Research new technologies',
+  'Practice presentation skills',
+  'Network with colleagues',
+  'Update resume',
+  'Plan career goals',
+  'Organize personal finances',
+  'Deep clean house',
+  'Maintain car service',
+  'Plan healthy meals',
+  'Set up home office',
+  'Learn new hobby',
+  'Volunteer for charity',
+  'Plan birthday party',
+  'Book travel reservations',
+  'Study for certification',
+  'Attend webinar',
+  'Update software',
+  'Create backup strategy',
   'Set up home security system',
   'Create workout schedule',
   'Write thank you notes',
@@ -54,33 +71,44 @@ const mockTodoNames = [
   'Plan family reunion activities'
 ];
 
-const statuses: TodoStatus[] = ['pending', 'completed', 'late'];
+export async function seedMockTodos(userId: string, count: number = 50) {
+  if (!userId) {
+    throw new Error('User ID is required to seed todos');
+  }
 
-export async function seedMockTodos() {
-  console.log('Starting to seed mock todos...');
+  console.log(`Starting to seed ${count} mock todos for user ${userId}...`);
 
   try {
-    const promises = mockTodoNames.map((name, index) => {
-      // Distribute statuses evenly across all todos
-      const statusIndex = index % statuses.length;
-      const status = statuses[statusIndex];
+    const promises = Array.from({ length: Math.min(count, todoNames.length) }, (_, index) => {
+      const name = todoNames[index % todoNames.length];
 
-      return createTodo(name, status);
+      // Generate random deadline between 7 days ago and 7 days ahead
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+      const sevenDaysAhead = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000));
+
+      // Random time between the two dates
+      const randomTime = sevenDaysAgo.getTime() + Math.random() * (sevenDaysAhead.getTime() - sevenDaysAgo.getTime());
+      const randomDeadline = new Date(randomTime);
+
+      // Random completion status (30% chance of being completed)
+      const completed = Math.random() < 0.3;
+
+      return createTodo(name, randomDeadline, userId, completed);
     });
 
     const results = await Promise.all(promises);
 
     console.log(`Successfully created ${results.length} mock todos!`);
-    console.log('Status distribution:');
 
-    const statusCounts = results.reduce((counts, todo) => {
-      counts[todo.status] = (counts[todo.status] || 0) + 1;
-      return counts;
-    }, {} as Record<TodoStatus, number>);
+    // Log some statistics
+    const completedCount = results.filter(todo => todo.completed).length;
+    const pendingCount = results.length - completedCount;
 
-    Object.entries(statusCounts).forEach(([status, count]) => {
-      console.log(`  ${status}: ${count} items`);
-    });
+    console.log(`📊 Statistics:`);
+    console.log(`  ✅ Completed: ${completedCount}`);
+    console.log(`  📋 Pending: ${pendingCount}`);
+    console.log(`  📅 Date range: 7 days ago to 7 days ahead`);
 
     return results;
   } catch (error) {
@@ -89,15 +117,7 @@ export async function seedMockTodos() {
   }
 }
 
-// Only run if this file is executed directly
-if (require.main === module) {
-  seedMockTodos()
-    .then(() => {
-      console.log('Mock data seeding completed!');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('Failed to seed mock data:', error);
-      process.exit(1);
-    });
+// Make the function available globally for browser console use
+if (typeof window !== 'undefined') {
+  (window as any).seedMockTodos = seedMockTodos;
 }

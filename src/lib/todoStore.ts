@@ -8,6 +8,7 @@ import {
   deleteDoc,
   serverTimestamp,
   query,
+  where,
   orderBy,
   Timestamp
 } from 'firebase/firestore';
@@ -24,16 +25,18 @@ const firestoreToTodo = (id: string, data: FirestoreTodo): Todo => {
     completed: data.completed,
     deadline: data.deadline.toDate(),
     createdAt: data.createdAt.toDate(),
-    updatedAt: data.updatedAt.toDate()
+    updatedAt: data.updatedAt.toDate(),
+    userId: data.userId
   };
 
   return todo;
 };
 
-export const getAllTodos = async (): Promise<Todo[]> => {
+export const getAllTodos = async (userId: string): Promise<Todo[]> => {
   try {
     const todosQuery = query(
       collection(db, TODOS_COLLECTION),
+      where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );
     const querySnapshot = await getDocs(todosQuery);
@@ -47,13 +50,18 @@ export const getAllTodos = async (): Promise<Todo[]> => {
   }
 };
 
-export const getTodoById = async (id: string): Promise<Todo | null> => {
+export const getTodoById = async (id: string, userId: string): Promise<Todo | null> => {
   try {
     const docRef = doc(db, TODOS_COLLECTION, id);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return firestoreToTodo(docSnap.id, docSnap.data() as FirestoreTodo);
+      const data = docSnap.data() as FirestoreTodo;
+      // Verify the todo belongs to the user
+      if (data.userId !== userId) {
+        return null;
+      }
+      return firestoreToTodo(docSnap.id, data);
     }
 
     return null;
@@ -63,12 +71,13 @@ export const getTodoById = async (id: string): Promise<Todo | null> => {
   }
 };
 
-export const createTodo = async (name: string, deadline: Date, completed: boolean = false): Promise<Todo> => {
+export const createTodo = async (name: string, deadline: Date, userId: string, completed: boolean = false): Promise<Todo> => {
   try {
     const newTodo = {
       name,
       completed,
       deadline: Timestamp.fromDate(deadline),
+      userId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -76,7 +85,7 @@ export const createTodo = async (name: string, deadline: Date, completed: boolea
     const docRef = await addDoc(collection(db, TODOS_COLLECTION), newTodo);
 
     // Fetch the created document to return it with proper timestamps
-    const createdTodo = await getTodoById(docRef.id);
+    const createdTodo = await getTodoById(docRef.id, userId);
     if (!createdTodo) {
       throw new Error('Failed to retrieve created todo');
     }
@@ -88,13 +97,18 @@ export const createTodo = async (name: string, deadline: Date, completed: boolea
   }
 };
 
-export const updateTodo = async (id: string, updates: { name?: string; completed?: boolean; deadline?: Date }): Promise<Todo | null> => {
+export const updateTodo = async (id: string, userId: string, updates: { name?: string; completed?: boolean; deadline?: Date }): Promise<Todo | null> => {
   try {
     const docRef = doc(db, TODOS_COLLECTION, id);
 
-    // Check if document exists
+    // Check if document exists and belongs to user
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
+      return null;
+    }
+
+    const data = docSnap.data() as FirestoreTodo;
+    if (data.userId !== userId) {
       return null;
     }
 
@@ -114,21 +128,26 @@ export const updateTodo = async (id: string, updates: { name?: string; completed
 
     await updateDoc(docRef, updateData);
 
-    // Return the updated document
-    return await getTodoById(id);
+    // Return updated todo
+    return getTodoById(id, userId);
   } catch (error) {
     console.error('Error updating todo:', error);
     throw new Error('Failed to update todo');
   }
 };
 
-export const deleteTodo = async (id: string): Promise<boolean> => {
+export const deleteTodo = async (id: string, userId: string): Promise<boolean> => {
   try {
     const docRef = doc(db, TODOS_COLLECTION, id);
 
-    // Check if document exists
+    // Check if document exists and belongs to user
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
+      return false;
+    }
+
+    const data = docSnap.data() as FirestoreTodo;
+    if (data.userId !== userId) {
       return false;
     }
 

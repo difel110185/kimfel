@@ -3,14 +3,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getAllTodos, createTodo, updateTodo, deleteTodo } from '../../lib/todoStore';
 import { Todo, TodoStatus, calculateTodoStatus } from '../../types/todo';
+import { useAuth } from '../../contexts/AuthContext';
 import AddTodoForm from './components/AddTodoForm';
 import EditTodoForm from './components/EditTodoForm';
+import SeedButton from '../../components/SeedButton';
 import styles from './page.module.css';
 
 type SortField = 'name' | 'deadline' | 'completed' | 'createdAt' | 'updatedAt';
 type SortDirection = 'asc' | 'desc';
 
 export default function TodosPage() {
+  const { user, loading: authLoading } = useAuth();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,15 +35,13 @@ export default function TodosPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
-
   const fetchTodos = async () => {
+    if (!user) return;
     try {
       setLoading(true);
-      const fetchedTodos = await getAllTodos();
+      const fetchedTodos = await getAllTodos(user.uid);
       setTodos(fetchedTodos);
+      setError(null);
     } catch (err) {
       setError('Failed to fetch todos');
       console.error(err);
@@ -49,7 +50,16 @@ export default function TodosPage() {
     }
   };
 
-  // Filter and sort todos with calculated status
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchTodos();
+    } else if (!authLoading && !user) {
+      setLoading(false);
+      setTodos([]);
+    }
+  }, [user, authLoading]);
+
+  // Filter and sort todos with calculated status - MOVED BEFORE EARLY RETURNS
   const filteredAndSortedTodos = useMemo(() => {
     let filtered = todos.filter(todo => {
       const matchesName = todo.name.toLowerCase().includes(nameFilter.toLowerCase());
@@ -84,13 +94,14 @@ export default function TodosPage() {
     return filtered;
   }, [todos, nameFilter, statusFilter, sortField, sortDirection]);
 
-  // Pagination
+  // Pagination - MOVED BEFORE EARLY RETURNS
   const totalPages = Math.ceil(filteredAndSortedTodos.length / itemsPerPage);
   const paginatedTodos = filteredAndSortedTodos.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // ALL FUNCTION DEFINITIONS - MOVED BEFORE EARLY RETURNS
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -102,7 +113,7 @@ export default function TodosPage() {
 
   const handleAddTodo = async (name: string, deadline: Date) => {
     try {
-      await createTodo(name, deadline, false); // Default completed to false
+      await createTodo(name, deadline, user.uid, false);
       await fetchTodos();
     } catch (err) {
       setError('Failed to create todo');
@@ -112,7 +123,7 @@ export default function TodosPage() {
 
   const handleEditTodo = async (id: string, name: string, deadline: Date) => {
     try {
-      await updateTodo(id, { name, deadline });
+      await updateTodo(id, user.uid, { name, deadline });
       await fetchTodos();
     } catch (err) {
       setError('Failed to update todo');
@@ -124,7 +135,7 @@ export default function TodosPage() {
     if (!confirm('Are you sure you want to delete this todo?')) return;
 
     try {
-      await deleteTodo(id);
+      await deleteTodo(id, user.uid);
       await fetchTodos();
     } catch (err) {
       setError('Failed to delete todo');
@@ -133,7 +144,6 @@ export default function TodosPage() {
 
   const handleCompleteTodo = async (id: string, currentCompleted: boolean) => {
     try {
-      // Optimistically update the UI first
       setTodos(prevTodos =>
         prevTodos.map(todo =>
           todo.id === id
@@ -142,14 +152,9 @@ export default function TodosPage() {
         )
       );
 
-      // Then update the database
-      await updateTodo(id, { completed: !currentCompleted });
-
-      // If the database update fails, the error will be caught and we can revert
-      // But for now, we trust the update succeeded since we did optimistic update
+      await updateTodo(id, user.uid, { completed: !currentCompleted });
     } catch (err) {
       setError('Failed to update todo');
-      // Revert the optimistic update by re-fetching from database
       await fetchTodos();
     }
   };
@@ -170,6 +175,28 @@ export default function TodosPage() {
     setCurrentPage(1);
   };
 
+  // NOW SAFE TO HAVE EARLY RETURNS AFTER ALL HOOKS ARE DECLARED
+  // Show loading state while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Loading...</div>
+      </div>
+    );
+  }
+
+  // Show authentication prompt if user is not logged in
+  if (!user) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.authPrompt}>
+          <h2>Welcome to Todo App</h2>
+          <p>Please sign in with Google to manage your todos.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return <div className={styles.loading}>Loading todos...</div>;
 
   return (
@@ -185,6 +212,9 @@ export default function TodosPage() {
           <button onClick={() => setError(null)} className={styles.closeError}>×</button>
         </div>
       )}
+
+      {/* Add seed button if user has no todos or very few todos */}
+      {todos.length < 10 && <SeedButton />}
 
       <div className={styles.controls}>
         <div className={styles.filters}>

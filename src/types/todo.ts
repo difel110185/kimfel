@@ -9,6 +9,7 @@ export interface Todo {
   deadline: Date;
   createdAt: Date;
   updatedAt: Date;
+  userId: string;
 }
 
 // Firestore version of Todo (with Firestore Timestamps)
@@ -18,6 +19,7 @@ export interface FirestoreTodo {
   deadline: Timestamp;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  userId: string;
 }
 
 export interface CreateTodoRequest {
@@ -33,7 +35,7 @@ export interface UpdateTodoRequest {
 }
 
 // Helper function to calculate status
-export function calculateTodoStatus(todo: { completed: boolean; deadline: Date }): TodoStatus {
+export function calculateTodoStatus(todo: Todo): TodoStatus {
   if (todo.completed) {
     return 'completed';
   }

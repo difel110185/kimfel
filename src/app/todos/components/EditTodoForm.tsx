@@ -65,6 +65,7 @@ export default function EditTodoForm({ isOpen, todo, onClose, onSubmit }: EditTo
 
   const currentStatus = calculateTodoStatus(todo);
   const previewStatus = calculateTodoStatus({
+    ...todo,
     completed: todo.completed,
     deadline: new Date(deadline)
   });
