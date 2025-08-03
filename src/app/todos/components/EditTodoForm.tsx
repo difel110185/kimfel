@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Todo, calculateTodoStatus } from '../../../types/todo';
+import { Todo, calculateTodoStatus } from '@/types/todo';
 import styles from './TodoForm.module.css';
 
 interface EditTodoFormProps {

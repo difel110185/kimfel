@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, AuthContextType } from '../types/user';
-import { signInWithGoogle, signOut, onAuthStateChange } from '../lib/auth';
+import { User, AuthContextType } from '@/types/user';
+import { signInWithGoogle, signOut, onAuthStateChange } from '@/lib/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

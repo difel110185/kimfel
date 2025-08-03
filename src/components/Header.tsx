@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import styles from './Header.module.css';
 
 const Header: React.FC = () => {

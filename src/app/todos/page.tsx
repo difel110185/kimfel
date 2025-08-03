@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { getAllTodos, createTodo, updateTodo, deleteTodo } from '../../lib/todoStore';
-import { Todo, TodoStatus, calculateTodoStatus } from '../../types/todo';
-import { useAuth } from '../../contexts/AuthContext';
+import { getAllTodos, createTodo, updateTodo, deleteTodo } from '@/lib/todoStore';
+import { Todo, TodoStatus, calculateTodoStatus } from '@/types/todo';
+import { useAuth } from '@/contexts/AuthContext';
 import AddTodoForm from './components/AddTodoForm';
 import EditTodoForm from './components/EditTodoForm';
 import SeedButton from '../../components/SeedButton';

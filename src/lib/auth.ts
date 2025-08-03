@@ -6,7 +6,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, Timestamp } from 'firebase/firestore';
 import { auth, googleProvider, db } from './firebase';
-import { User, FirestoreUser } from '../types/user';
+import { User, FirestoreUser } from '@/types/user';
 
 // Convert Firebase User to our User type
 export const convertFirebaseUser = (firebaseUser: FirebaseUser): User => ({

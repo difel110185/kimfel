@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { seedMockTodos } from '../scripts/seedMockTodos';
+import { useAuth } from '@/contexts/AuthContext';
+import { seedMockTodos } from '@/scripts/seedMockTodos';
 import styles from './SeedButton.module.css';
 
 const SeedButton = () => {
