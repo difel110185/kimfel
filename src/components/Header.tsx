@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 import styles from './Header.module.css';
 
 const Header: React.FC = () => {
@@ -13,9 +13,9 @@ const Header: React.FC = () => {
       <header className={styles.header}>
         <div className={styles.container}>
           <h1 className={styles.title}>Todo App</h1>
-          <div className={styles.loading}>Loading...</div>
-        </div>
-      </header>
+          <Link href="/" className={styles.titleLink}>
+            <h1 className={styles.title}>Todo App</h1>
+          </Link>
     );
   }
 
@@ -25,9 +25,9 @@ const Header: React.FC = () => {
         <h1 className={styles.title}>Todo App</h1>
 
         {user ? (
-          <div className={styles.userSection}>
-            <div className={styles.userInfo}>
-              {user.photoURL && (
+        <Link href="/" className={styles.titleLink}>
+          <h1 className={styles.title}>Todo App</h1>
+        </Link>
                 <Image
                   src={user.photoURL}
                   alt="Profile"

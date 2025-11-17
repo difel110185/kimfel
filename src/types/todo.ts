@@ -6,6 +6,8 @@ export interface Todo {
   id: string;
   name: string;
   completed: boolean;
+  included: boolean;
+  includedAt: Date;
   deadline: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -16,6 +18,8 @@ export interface Todo {
 export interface FirestoreTodo {
   name: string;
   completed: boolean;
+  included: boolean;
+  includedAt: Timestamp;
   deadline: Timestamp;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -25,12 +29,16 @@ export interface FirestoreTodo {
 export interface CreateTodoRequest {
   name: string;
   completed?: boolean;
+  included?: boolean;
+  includedAt?: Date;
   deadline: Date;
 }
 
 export interface UpdateTodoRequest {
   name?: string;
   completed?: boolean;
+  included?: boolean;
+  includedAt?: Date;
   deadline?: Date;
 }
 

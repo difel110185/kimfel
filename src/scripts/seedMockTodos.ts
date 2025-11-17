@@ -94,7 +94,17 @@ export async function seedMockTodos(userId: string, count: number = 50) {
       // Random completion status (30% chance of being completed)
       const completed = Math.random() < 0.3;
 
-      return createTodo(name, randomDeadline, userId, completed);
+      // Generate random includedAt date between 2 days ago and 7 days ahead
+      const today = new Date();
+      const twoDaysAgo = new Date(today.getTime() - (2 * 24 * 60 * 60 * 1000));
+      const sevenDaysAheadForActivation = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
+      const includedAtTime = twoDaysAgo.getTime() + Math.random() * (sevenDaysAheadForActivation.getTime() - twoDaysAgo.getTime());
+      const includedAt = new Date(includedAtTime);
+
+      // Included should be true if includedAt is today or prior
+      const included = includedAt <= today;
+
+      return createTodo(name, randomDeadline, userId, completed, included, includedAt);
     });
 
     const results = await Promise.all(promises);
@@ -103,12 +113,17 @@ export async function seedMockTodos(userId: string, count: number = 50) {
 
     // Log some statistics
     const completedCount = results.filter(todo => todo.completed).length;
+    const includedCount = results.filter(todo => todo.included).length;
     const pendingCount = results.length - completedCount;
+    const excludedCount = results.length - includedCount;
 
     console.log(`📊 Statistics:`);
     console.log(`  ✅ Completed: ${completedCount}`);
     console.log(`  📋 Pending: ${pendingCount}`);
-    console.log(`  📅 Date range: 7 days ago to 7 days ahead`);
+    console.log(`  🟢 Included: ${includedCount}`);
+    console.log(`  ⚫ Excluded: ${excludedCount}`);
+    console.log(`  📅 Deadline range: 7 days ago to 7 days ahead`);
+    console.log(`  🚀 IncludedAt range: 2 days ago to 7 days ahead`);
 
     return results;
   } catch (error) {

@@ -22,6 +22,14 @@ export default function Home() {
           </div>
 
           <div className={styles.featureCard}>
+            <h3>🟢 Active Todos</h3>
+            <p>View your currently active todos sorted by deadline to focus on what needs attention first.</p>
+            <Link href="/active-todos" className={styles.featureLink}>
+              View Active Todos →
+            </Link>
+          </div>
+
+          <div className={styles.featureCard}>
             <h3>🔍 Smart Filtering</h3>
             <p>Find exactly what you need with name-based search and status filtering.</p>
           </div>

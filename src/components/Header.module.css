@@ -6,6 +6,20 @@
 }
 
 .container {
+.titleLink {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.titleLink:hover {
+  opacity: 0.8;
+}
+
+.titleLink:hover .title {
+  color: #4299e1;
+}
+
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;

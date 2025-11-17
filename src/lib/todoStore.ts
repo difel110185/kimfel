@@ -23,6 +23,8 @@ const firestoreToTodo = (id: string, data: FirestoreTodo): Todo => {
     id,
     name: data.name,
     completed: data.completed,
+    included: data.included,
+    includedAt: data.includedAt.toDate(),
     deadline: data.deadline.toDate(),
     createdAt: data.createdAt.toDate(),
     updatedAt: data.updatedAt.toDate(),
@@ -71,11 +73,13 @@ export const getTodoById = async (id: string, userId: string): Promise<Todo | nu
   }
 };
 
-export const createTodo = async (name: string, deadline: Date, userId: string, completed: boolean = false): Promise<Todo> => {
+export const createTodo = async (name: string, deadline: Date, userId: string, completed: boolean = false, included: boolean = true, includedAt?: Date): Promise<Todo> => {
   try {
     const newTodo = {
       name,
       completed,
+      included,
+      includedAt: Timestamp.fromDate(includedAt || new Date()),
       deadline: Timestamp.fromDate(deadline),
       userId,
       createdAt: serverTimestamp(),
@@ -97,7 +101,7 @@ export const createTodo = async (name: string, deadline: Date, userId: string, c
   }
 };
 
-export const updateTodo = async (id: string, userId: string, updates: { name?: string; completed?: boolean; deadline?: Date }): Promise<Todo | null> => {
+export const updateTodo = async (id: string, userId: string, updates: { name?: string; completed?: boolean; included?: boolean; includedAt?: Date; deadline?: Date }): Promise<Todo | null> => {
   try {
     const docRef = doc(db, TODOS_COLLECTION, id);
 
@@ -121,6 +125,12 @@ export const updateTodo = async (id: string, userId: string, updates: { name?: s
     }
     if (updates.completed !== undefined) {
       updateData.completed = updates.completed;
+    }
+    if (updates.included !== undefined) {
+      updateData.included = updates.included;
+    }
+    if (updates.includedAt !== undefined) {
+      updateData.includedAt = Timestamp.fromDate(updates.includedAt);
     }
     if (updates.deadline !== undefined) {
       updateData.deadline = Timestamp.fromDate(updates.deadline);

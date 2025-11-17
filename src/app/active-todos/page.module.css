@@ -1,0 +1,273 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  color: #2d3748;
+  margin-bottom: 8px;
+  font-size: 2rem;
+}
+
+.header p {
+  color: #718096;
+  margin-bottom: 16px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: #4299e1;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid #4299e1;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.backLink:hover {
+  background-color: #4299e1;
+  color: white;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 18px;
+  color: #718096;
+}
+
+.authPrompt {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f7fafc;
+  border-radius: 8px;
+  margin: 40px 0;
+}
+
+.authPrompt h2 {
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+}
+}
+  }
+    min-width: auto;
+  .label {
+
+  }
+    gap: 4px;
+    align-items: flex-start;
+    flex-direction: column;
+  .detailRow {
+
+  }
+    gap: 12px;
+    align-items: flex-start;
+    flex-direction: column;
+  .todoHeader {
+
+  }
+    font-size: 1.75rem;
+  .header h1 {
+
+  }
+    padding: 16px;
+  .container {
+@media (max-width: 768px) {
+/* Responsive design */
+
+}
+  font-size: 0.875rem;
+  margin-top: 8px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #2f855a;
+  background: #c6f6d5;
+.todayNotice {
+
+}
+  font-size: 0.875rem;
+  margin-top: 8px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #c53030;
+  background: #fed7d7;
+.overdueWarning {
+
+}
+  color: #2d3748;
+.value {
+
+}
+  flex-shrink: 0;
+  min-width: 100px;
+  color: #4a5568;
+  font-weight: 600;
+.label {
+
+}
+  align-items: center;
+  gap: 12px;
+  display: flex;
+.detailRow {
+
+}
+  gap: 8px;
+  flex-direction: column;
+  display: flex;
+.todoDetails {
+
+}
+  color: #c53030;
+  background-color: #fed7d7;
+.statusBadge.late {
+
+}
+  color: #2f855a;
+  background-color: #c6f6d5;
+.statusBadge.completed {
+
+}
+  color: #2b6cb0;
+  background-color: #bee3f8;
+.statusBadge.pending {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 20px;
+  padding: 4px 12px;
+.statusBadge {
+
+}
+  line-height: 1.4;
+  flex: 1;
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0;
+  color: #2d3748;
+.todoName {
+
+}
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  display: flex;
+.todoHeader {
+
+}
+  background: #f0fff4;
+  border-left: 4px solid #38a169;
+.todoCard.today {
+
+}
+  background: #fef5e7;
+  border-left: 4px solid #e53e3e;
+.todoCard.overdue {
+
+}
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.todoCard:hover {
+
+}
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+.todoCard {
+
+}
+  gap: 16px;
+  display: grid;
+.todoList {
+
+}
+  color: white;
+  background-color: #4299e1;
+.createLink:hover {
+
+}
+  transition: all 0.2s;
+  border-radius: 6px;
+  border: 2px solid #4299e1;
+  padding: 12px 24px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #4299e1;
+  align-items: center;
+  display: inline-flex;
+.createLink {
+
+}
+  margin-bottom: 24px;
+  color: #718096;
+.emptyState p {
+
+}
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  color: #2d3748;
+.emptyState h3 {
+
+}
+  margin: 40px 0;
+  border-radius: 8px;
+  background: #f7fafc;
+  padding: 60px 20px;
+  text-align: center;
+.emptyState {
+
+}
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 24px;
+  border-radius: 6px;
+  padding: 12px 16px;
+  background: #edf2f7;
+.stats {
+
+}
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  height: 24px;
+  width: 24px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 18px;
+  color: #c53030;
+  border: none;
+  background: none;
+.closeError {
+
+}
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  padding: 16px;
+  color: #c53030;
+  background-color: #fed7d7;
+.error {
+
+}
+  color: #718096;
+.authPrompt p {
+

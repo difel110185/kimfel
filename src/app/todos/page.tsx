@@ -113,7 +113,7 @@ export default function TodosPage() {
 
   const handleAddTodo = async (name: string, deadline: Date) => {
     try {
-      await createTodo(name, deadline, user.uid, false);
+      await createTodo(name, deadline, user.uid, false, true, new Date());
       await fetchTodos();
     } catch (err) {
       setError('Failed to create todo');
@@ -122,6 +122,7 @@ export default function TodosPage() {
   };
 
   const handleEditTodo = async (id: string, name: string, deadline: Date) => {
+    if (!user) return;
     try {
       await updateTodo(id, user.uid, { name, deadline });
       await fetchTodos();
@@ -132,6 +133,7 @@ export default function TodosPage() {
   };
 
   const handleDeleteTodo = async (id: string) => {
+    if (!user) return;
     if (!confirm('Are you sure you want to delete this todo?')) return;
 
     try {
@@ -143,6 +145,7 @@ export default function TodosPage() {
   };
 
   const handleCompleteTodo = async (id: string, currentCompleted: boolean) => {
+    if (!user) return;
     try {
       setTodos(prevTodos =>
         prevTodos.map(todo =>
@@ -153,6 +156,24 @@ export default function TodosPage() {
       );
 
       await updateTodo(id, user.uid, { completed: !currentCompleted });
+    } catch (err) {
+      setError('Failed to update todo');
+      await fetchTodos();
+    }
+  };
+
+  const handleToggleIncluded = async (id: string, currentIncluded: boolean) => {
+    if (!user) return;
+    try {
+      setTodos(prevTodos =>
+        prevTodos.map(todo =>
+          todo.id === id
+            ? { ...todo, included: !currentIncluded, updatedAt: new Date() }
+            : todo
+        )
+      );
+
+      await updateTodo(id, user.uid, { included: !currentIncluded });
     } catch (err) {
       setError('Failed to update todo');
       await fetchTodos();
@@ -272,6 +293,8 @@ export default function TodosPage() {
                 Name {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
               <th>Status</th>
+              <th>Included</th>
+              <th>Included At</th>
               <th
                 className={styles.sortableHeader}
                 onClick={() => handleSort('deadline')}
@@ -285,12 +308,20 @@ export default function TodosPage() {
             {paginatedTodos.map(todo => {
               const status = calculateTodoStatus(todo);
               return (
-                <tr key={todo.id}>
+                <tr key={todo.id} className={!todo.included ? styles.inactiveRow : ''}>
                   <td className={styles.nameCell}>{todo.name}</td>
                   <td>
                     <span className={`${styles.statusBadge} ${styles[status]}`}>
                       {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
                     </span>
+                  </td>
+                  <td>
+                    <span className={`${styles.activeBadge} ${todo.included ? styles.activeTrue : styles.activeFalse}`}>
+                      {todo.included ? '🟢 Included' : '⚫ Excluded'}
+                    </span>
+                  </td>
+                  <td className={styles.dateCell}>
+                    {new Date(todo.includedAt).toLocaleString()}
                   </td>
                   <td className={styles.dateCell}>
                     {new Date(todo.deadline).toLocaleString()}

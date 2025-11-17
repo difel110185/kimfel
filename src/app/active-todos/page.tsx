@@ -1,0 +1,161 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { getAllTodos } from '@/lib/todoStore';
+import { Todo, calculateTodoStatus } from '@/types/todo';
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
+import styles from './page.module.css';
+
+export default function ActiveTodosPage() {
+  const { user, loading: authLoading } = useAuth();
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTodos = async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const fetchedTodos = await getAllTodos(user.uid);
+      setTodos(fetchedTodos);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch todos');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchTodos();
+    } else if (!authLoading && !user) {
+      setLoading(false);
+      setTodos([]);
+    }
+  }, [user, authLoading]);
+
+  // Filter included todos and sort by deadline ASC
+  const includedTodos = useMemo(() => {
+    return todos
+      .filter(todo => todo.included) // Only included todos
+      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()); // Sort by deadline ASC
+  }, [todos]);
+
+  // Show loading state while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Loading...</div>
+      </div>
+    );
+  }
+
+  // Show authentication prompt if user is not logged in
+  if (!user) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.authPrompt}>
+          <h2>Welcome to Active Todos</h2>
+          <p>Please sign in with Google to view your active todos.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) return <div className={styles.loading}>Loading active todos...</div>;
+
+  return (
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1>Active Todos</h1>
+        <p>Your active todos sorted by deadline (earliest first)</p>
+        <Link href="/todos" className={styles.backLink}>
+          ← Back to All Todos
+        </Link>
+      </header>
+
+      {error && (
+        <div className={styles.error}>
+          {error}
+          <button onClick={() => setError(null)} className={styles.closeError}>×</button>
+        </div>
+      )}
+
+      <div className={styles.stats}>
+        Showing {includedTodos.length} active todos
+        {todos.length > 0 && ` out of ${todos.length} total todos`}
+      </div>
+
+      {includedTodos.length === 0 ? (
+        <div className={styles.emptyState}>
+          <h3>No Active Todos</h3>
+          <p>You don't have any active todos at the moment.</p>
+          <Link href="/todos" className={styles.createLink}>
+            Go to All Todos →
+          </Link>
+        </div>
+      ) : (
+        <div className={styles.todoList}>
+          {includedTodos.map(todo => {
+            const status = calculateTodoStatus(todo);
+            const now = new Date();
+            const deadline = new Date(todo.deadline);
+            const isOverdue = deadline < now && !todo.completed;
+            const isToday = deadline.toDateString() === now.toDateString();
+
+            return (
+              <div
+                key={todo.id}
+                className={`${styles.todoCard} ${isOverdue ? styles.overdue : ''} ${isToday ? styles.today : ''}`}
+              >
+                <div className={styles.todoHeader}>
+                  <h3 className={styles.todoName}>{todo.name}</h3>
+                  <span className={`${styles.statusBadge} ${styles[status]}`}>
+                    {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
+                  </span>
+                </div>
+
+                <div className={styles.todoDetails}>
+                  <div className={styles.detailRow}>
+                    <span className={styles.label}>Deadline:</span>
+                    <span className={styles.value}>
+                      {deadline.toLocaleDateString()} at {deadline.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+
+                  <div className={styles.detailRow}>
+                    <span className={styles.label}>Included At:</span>
+                    <span className={styles.value}>
+                      {new Date(todo.includedAt).toLocaleDateString()} at {new Date(todo.includedAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+
+                  {isOverdue && (
+                    <div className={styles.overdueWarning}>
+                      ⚠️ This todo is overdue
+                    </div>
+                  )}
+
+                  {isToday && !isOverdue && (
+                    <div className={styles.todayNotice}>
+                      🎯 Due today
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
