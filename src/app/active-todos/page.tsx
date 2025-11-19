@@ -14,6 +14,17 @@ export default function ActiveTodosPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [completingId, setCompletingId] = useState<string | null>(null);
+  const [excludingId, setExcludingId] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update current time every minute to recalculate remaining time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // 60000ms = 1 minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchTodos = async () => {
     if (!user) return;
@@ -30,20 +41,37 @@ export default function ActiveTodosPage() {
     }
   };
 
-  const handleCompleteTodo = async (todoId: string) => {
+  const handleToggleComplete = async (todoId: string, currentCompleted: boolean) => {
     if (!user) return;
     try {
       setCompletingId(todoId);
-      const updatedTodo = await updateTodo(todoId, user.uid, { completed: true });
+      const updatedTodo = await updateTodo(todoId, user.uid, { completed: !currentCompleted });
       if (updatedTodo) {
         setTodos(todos.map(todo => todo.id === todoId ? updatedTodo : todo));
         setExpandedId(null);
       }
     } catch (err) {
-      setError('Failed to complete todo');
+      setError('Failed to update todo');
       console.error(err);
     } finally {
       setCompletingId(null);
+    }
+  };
+
+  const handleExcludeTodo = async (todoId: string) => {
+    if (!user) return;
+    try {
+      setExcludingId(todoId);
+      const updatedTodo = await updateTodo(todoId, user.uid, { included: false });
+      if (updatedTodo) {
+        setTodos(todos.map(todo => todo.id === todoId ? updatedTodo : todo));
+        setExpandedId(null);
+      }
+    } catch (err) {
+      setError('Failed to exclude todo');
+      console.error(err);
+    } finally {
+      setExcludingId(null);
     }
   };
 
@@ -110,13 +138,43 @@ export default function ActiveTodosPage() {
       ) : (
         <div className={styles.todoList}>
           {includedTodos.map(todo => {
-            const status = calculateTodoStatus(todo);
-            const now = new Date();
+            const now = currentTime;
             const deadline = new Date(todo.deadline);
             const isOverdue = deadline < now && !todo.completed;
             const isToday = deadline.toDateString() === now.toDateString() && !todo.completed;
             const isCompleted = todo.completed;
             const isExpanded = expandedId === todo.id;
+
+            // Calculate remaining time
+            const timeDiff = deadline.getTime() - now.getTime();
+            const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hoursRemaining = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutesRemaining = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+            let timeRemainingText = '';
+            if (isOverdue) {
+              const daysOverdue = Math.abs(daysRemaining);
+              const hoursOverdue = Math.abs(hoursRemaining);
+              if (daysOverdue > 0) {
+                timeRemainingText = `${daysOverdue}d overdue`;
+              } else if (hoursOverdue > 0) {
+                timeRemainingText = `${hoursOverdue}h overdue`;
+              } else {
+                timeRemainingText = `${Math.abs(minutesRemaining)}m overdue`;
+              }
+            } else if (isCompleted) {
+              timeRemainingText = 'Completed';
+            } else {
+              if (daysRemaining > 0) {
+                timeRemainingText = `${daysRemaining}d ${hoursRemaining}h`;
+              } else if (hoursRemaining > 0) {
+                timeRemainingText = `${hoursRemaining}h ${minutesRemaining}m`;
+              } else if (minutesRemaining > 0) {
+                timeRemainingText = `${minutesRemaining}m`;
+              } else {
+                timeRemainingText = 'Due now';
+              }
+            }
 
             // Determine background class based on priority
             let colorClass = '';
@@ -143,11 +201,9 @@ export default function ActiveTodosPage() {
                   <div className={styles.todoTitleRow}>
                     <h3 className={styles.todoName}>{todo.name}</h3>
                     <div className={styles.headerRight}>
-                      {(isOverdue || isToday) && (
-                        <span className={styles.quickIndicator}>
-                          {isOverdue ? '⏰' : '🎯'}
-                        </span>
-                      )}
+                      <span className={styles.timeRemaining}>
+                        {timeRemainingText}
+                      </span>
                       <span className={styles.expandIcon}>
                         {isExpanded ? '▼' : '▶'}
                       </span>
@@ -157,53 +213,25 @@ export default function ActiveTodosPage() {
 
                 {isExpanded && (
                   <div className={styles.todoDetails}>
-                    <div className={styles.statusRow}>
-                      <span className={`${styles.statusBadge} ${styles[status]}`}>
-                        {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
-                      </span>
-                    </div>
+                    <button
+                      onClick={() => handleToggleComplete(todo.id, todo.completed)}
+                      disabled={completingId === todo.id}
+                      className={todo.completed ? styles.undoButton : styles.completeButton}
+                    >
+                      {completingId === todo.id
+                        ? '⏳ Updating...'
+                        : todo.completed
+                          ? '↶ Mark as Incomplete'
+                          : '✓ Mark as Complete'}
+                    </button>
 
-                    <div className={styles.detailRow}>
-                      <span className={styles.label}>Deadline:</span>
-                      <span className={styles.value}>
-                        {deadline.toLocaleDateString()} at {deadline.toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-
-                    <div className={styles.detailRow}>
-                      <span className={styles.label}>Included At:</span>
-                      <span className={styles.value}>
-                        {new Date(todo.includedAt).toLocaleDateString()} at {new Date(todo.includedAt).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-
-                    {isOverdue && (
-                      <div className={styles.overdueWarning}>
-                        ⚠️ This todo is overdue
-                      </div>
-                    )}
-
-                    {isToday && !isOverdue && (
-                      <div className={styles.todayNotice}>
-                        🎯 Due today
-                      </div>
-                    )}
-
-                    {!todo.completed && (
-                      <button
-                        onClick={() => handleCompleteTodo(todo.id)}
-                        disabled={completingId === todo.id}
-                        className={styles.completeButton}
-                      >
-                        {completingId === todo.id ? '⏳ Completing...' : '✓ Mark as Complete'}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleExcludeTodo(todo.id)}
+                      disabled={excludingId === todo.id}
+                      className={styles.excludeButton}
+                    >
+                      {excludingId === todo.id ? '⏳ Excluding...' : '⚫ Exclude from Active'}
+                    </button>
                   </div>
                 )}
               </div>

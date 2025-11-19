@@ -4,6 +4,7 @@
   margin: 0 auto;
   padding: 2rem 1.5rem;
   min-height: calc(100vh - 80px);
+  background: white;
 }
 
 /* Header Section */
@@ -201,17 +202,9 @@
   transition: opacity 0.3s ease;
 }
 
-.todoCard:hover::before {
-  opacity: 0.5;
-}
-
 .todoCard.expanded {
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
   border-color: rgba(102, 126, 234, 0.3);
-}
-
-.todoCard.expanded::before {
-  opacity: 1;
 }
 
 .todoCard.completed {
@@ -220,22 +213,10 @@
   border-width: 2px;
 }
 
-.todoCard.completed::before {
-  background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
-  opacity: 1;
-  height: 5px;
-}
-
 .todoCard.overdue {
   background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
   border-color: #fc8181;
   border-width: 2px;
-}
-
-.todoCard.overdue::before {
-  background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
-  opacity: 1;
-  height: 5px;
 }
 
 .todoCard.today {
@@ -259,7 +240,7 @@
 }
 
 .todoHeader:hover {
-  background: rgba(102, 126, 234, 0.03);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .todoHeader:active {
@@ -286,6 +267,16 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.timeRemaining {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  white-space: nowrap;
 }
 
 .quickIndicator {
@@ -433,6 +424,74 @@
   cursor: not-allowed;
 }
 
+/* Undo Button */
+.undoButton {
+  margin-top: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.undoButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.undoButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.undoButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Exclude Button */
+.excludeButton {
+  margin-top: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.excludeButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 85, 104, 0.4);
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+.excludeButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.excludeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {
@@ -450,6 +509,11 @@
   .todoHeader {
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .timeRemaining {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
   }
 
   .detailRow {
