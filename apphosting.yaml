@@ -1,39 +1,40 @@
-# Settings for Cloud Run
+# Settings for Backend (on Cloud Run).
+# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
   minInstances: 1
   maxInstances: 1
-  concurrency: 100
-  cpu: 2
-  memoryMiB: 1024
+  # concurrency: 80
+  cpu: 1
+  memoryMiB: 512
 
-# Environment variables and secrets
-env:
-  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_API_KEY
+# Environment variables and secrets.
+  env:
+    - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+      secret: NEXT_PUBLIC_FIREBASE_API_KEY
 
-  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+      secret: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
 
-  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+      secret: NEXT_PUBLIC_FIREBASE_PROJECT_ID
 
-  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+      secret: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
 
-  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+      secret: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
 
-  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_APP_ID
+    - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+      secret: NEXT_PUBLIC_FIREBASE_APP_ID
 
-  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    secret: projects/550813213822/secrets/NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+      secret: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 
-  - variable: FIREBASE_PROJECT_ID
-    secret: projects/550813213822/secrets/FIREBASE_PROJECT_ID
+    - variable: FIREBASE_PROJECT_ID
+      secret: FIREBASE_PROJECT_ID
 
-  - variable: FIREBASE_CLIENT_EMAIL
-    secret: projects/550813213822/secrets/FIREBASE_CLIENT_EMAIL
+    - variable: FIREBASE_CLIENT_EMAIL
+      secret: FIREBASE_CLIENT_EMAIL
 
-  - variable: FIREBASE_PRIVATE_KEY
-    secret: projects/550813213822/secrets/FIREBASE_PRIVATE_KEY
+    - variable: FIREBASE_PRIVATE_KEY
+      secret: FIREBASE_PRIVATE_KEY
