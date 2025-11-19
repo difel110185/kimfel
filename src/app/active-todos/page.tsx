@@ -92,25 +92,12 @@ export default function ActiveTodosPage() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Active Todos</h1>
-        <p>Your active todos sorted by deadline (earliest first)</p>
-        <Link href="/todos" className={styles.backLink}>
-          ← Back to All Todos
-        </Link>
-      </header>
-
       {error && (
         <div className={styles.error}>
           {error}
           <button onClick={() => setError(null)} className={styles.closeError}>×</button>
         </div>
       )}
-
-      <div className={styles.stats}>
-        Showing {includedTodos.length} active todos
-        {todos.length > 0 && ` out of ${todos.length} total todos`}
-      </div>
 
       {includedTodos.length === 0 ? (
         <div className={styles.emptyState}>

@@ -5,44 +5,23 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        <header className={styles.hero}>
-          <h1 className={styles.title}>Welcome to Kimfel</h1>
-          <p className={styles.subtitle}>
-            Your personal productivity companion for managing tasks and staying organized.
-          </p>
-        </header>
+        <div className={styles.tilesContainer}>
+          <Link href="/todos" className={styles.tile}>
+            <div className={styles.tileIcon}>📋</div>
+            <h2 className={styles.tileTitle}>All Todos</h2>
+            <p className={styles.tileDescription}>
+              View and manage all your tasks with full control over creation, editing, and organization.
+            </p>
+            <span className={styles.tileArrow}>→</span>
+          </Link>
 
-        <div className={styles.features}>
-          <div className={styles.featureCard}>
-            <h3>📋 Todo Management</h3>
-            <p>Create, edit, and organize your tasks with powerful filtering and sorting capabilities.</p>
-            <Link href="/todos" className={styles.featureLink}>
-              Go to Todos →
-            </Link>
-          </div>
-
-          <div className={styles.featureCard}>
-            <h3>🟢 Active Todos</h3>
-            <p>View your currently active todos sorted by deadline to focus on what needs attention first.</p>
-            <Link href="/active-todos" className={styles.featureLink}>
-              View Active Todos →
-            </Link>
-          </div>
-
-          <div className={styles.featureCard}>
-            <h3>🔍 Smart Filtering</h3>
-            <p>Find exactly what you need with name-based search and status filtering.</p>
-          </div>
-
-          <div className={styles.featureCard}>
-            <h3>📊 Pagination</h3>
-            <p>Browse through your tasks efficiently with built-in pagination controls.</p>
-          </div>
-        </div>
-
-        <div className={styles.cta}>
-          <Link href="/todos" className={styles.ctaButton}>
-            Get Started with Todos
+          <Link href="/active-todos" className={styles.tile}>
+            <div className={styles.tileIcon}>🎯</div>
+            <h2 className={styles.tileTitle}>Active Todos</h2>
+            <p className={styles.tileDescription}>
+              Focus on your active tasks sorted by deadline to prioritize what matters most.
+            </p>
+            <span className={styles.tileArrow}>→</span>
           </Link>
         </div>
       </div>

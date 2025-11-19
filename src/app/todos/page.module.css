@@ -357,7 +357,64 @@
   transform: translateY(-1px);
 }
 
-.editButton:active, .deleteButton:active, .completeButton:active, .undoButton:active {
+.includeButton {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.includeButton:hover {
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.excludeButton {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.excludeButton:hover {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.viewButton {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.viewButton:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6b3f8a 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.editButton:active, .deleteButton:active, .completeButton:active, .undoButton:active, .includeButton:active, .excludeButton:active, .viewButton:active {
   transform: translateY(0);
 }
 
@@ -367,6 +424,72 @@
   padding: 60px 20px;
   color: var(--neutral-500);
   font-size: 16px;
+}
+
+/* Expanded Row / Accordion */
+.expandedRow {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expandedCell {
+  padding: 0 !important;
+}
+
+.detailsContainer {
+  padding: 24px;
+  border-top: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.detailsTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--neutral-700);
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--neutral-200);
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-200);
+}
+
+.detailLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--neutral-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detailValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-700);
+  word-break: break-all;
 }
 
 /* Pagination */
@@ -557,14 +680,26 @@
     padding: 10px 8px;
   }
 
+  /* Hide Status and Deadline columns on mobile */
+  .table th:nth-child(2),
+  .table td:nth-child(2),
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    display: none;
+  }
+
   .actions {
     flex-direction: column;
     gap: 6px;
   }
 
-  .editButton, .deleteButton, .completeButton, .undoButton {
+  .editButton, .deleteButton, .completeButton, .undoButton, .includeButton, .excludeButton, .viewButton {
     font-size: 12px;
     padding: 6px 12px;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
   }
 
   .modalContent {

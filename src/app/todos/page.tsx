@@ -21,6 +21,7 @@ export default function TodosPage() {
   // Filters
   const [nameFilter, setNameFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<TodoStatus | 'all'>('all');
+  const [includedFilter, setIncludedFilter] = useState<'all' | 'included' | 'excluded'>('all');
 
   // Sorting
   const [sortField, setSortField] = useState<SortField>('createdAt');
@@ -29,6 +30,9 @@ export default function TodosPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Accordion
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -65,7 +69,10 @@ export default function TodosPage() {
       const matchesName = todo.name.toLowerCase().includes(nameFilter.toLowerCase());
       const calculatedStatus = calculateTodoStatus(todo);
       const matchesStatus = statusFilter === 'all' || calculatedStatus === statusFilter;
-      return matchesName && matchesStatus;
+      const matchesIncluded = includedFilter === 'all' ||
+        (includedFilter === 'included' && todo.included) ||
+        (includedFilter === 'excluded' && !todo.included);
+      return matchesName && matchesStatus && matchesIncluded;
     });
 
     // Sort todos
@@ -92,7 +99,7 @@ export default function TodosPage() {
     });
 
     return filtered;
-  }, [todos, nameFilter, statusFilter, sortField, sortDirection]);
+  }, [todos, nameFilter, statusFilter, includedFilter, sortField, sortDirection]);
 
   // Pagination - MOVED BEFORE EARLY RETURNS
   const totalPages = Math.ceil(filteredAndSortedTodos.length / itemsPerPage);
@@ -165,15 +172,28 @@ export default function TodosPage() {
   const handleToggleIncluded = async (id: string, currentIncluded: boolean) => {
     if (!user) return;
     try {
+      const now = new Date();
+      const newIncluded = !currentIncluded;
+
       setTodos(prevTodos =>
         prevTodos.map(todo =>
           todo.id === id
-            ? { ...todo, included: !currentIncluded, updatedAt: new Date() }
+            ? {
+                ...todo,
+                included: newIncluded,
+                includedAt: newIncluded ? now : todo.includedAt,
+                updatedAt: now
+              }
             : todo
         )
       );
 
-      await updateTodo(id, user.uid, { included: !currentIncluded });
+      const updates: { included: boolean; includedAt?: Date } = { included: newIncluded };
+      if (newIncluded) {
+        updates.includedAt = now;
+      }
+
+      await updateTodo(id, user.uid, updates);
     } catch (err) {
       setError('Failed to update todo');
       await fetchTodos();
@@ -193,6 +213,7 @@ export default function TodosPage() {
   const resetFilters = () => {
     setNameFilter('');
     setStatusFilter('all');
+    setIncludedFilter('all');
     setCurrentPage(1);
   };
 
@@ -222,11 +243,6 @@ export default function TodosPage() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Todo Management</h1>
-        <p>Manage your todos with filtering, sorting, and pagination</p>
-      </header>
-
       {error && (
         <div className={styles.error}>
           {error}
@@ -235,7 +251,7 @@ export default function TodosPage() {
       )}
 
       {/* Add seed button if user has no todos or very few todos */}
-      {todos.length < 10 && <SeedButton />}
+      {todos.length === 0 && <SeedButton />}
 
       <div className={styles.controls}>
         <div className={styles.filters}>
@@ -262,6 +278,19 @@ export default function TodosPage() {
             <option value="pending">📋 Pending</option>
             <option value="completed">✅ Completed</option>
             <option value="late">⏰ Late</option>
+          </select>
+
+          <select
+            value={includedFilter}
+            onChange={(e) => {
+              setIncludedFilter(e.target.value as 'all' | 'included' | 'excluded');
+              setCurrentPage(1);
+            }}
+            className={styles.filterSelect}
+          >
+            <option value="all">Included and Excluded</option>
+            <option value="included">🟢 Included Only</option>
+            <option value="excluded">⚫ Excluded Only</option>
           </select>
 
           <button onClick={resetFilters} className={styles.resetButton}>
@@ -293,8 +322,6 @@ export default function TodosPage() {
                 Name {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
               <th>Status</th>
-              <th>Included</th>
-              <th>Included At</th>
               <th
                 className={styles.sortableHeader}
                 onClick={() => handleSort('deadline')}
@@ -307,47 +334,111 @@ export default function TodosPage() {
           <tbody>
             {paginatedTodos.map(todo => {
               const status = calculateTodoStatus(todo);
+              const isExpanded = expandedRowId === todo.id;
               return (
-                <tr key={todo.id} className={!todo.included ? styles.inactiveRow : ''}>
-                  <td className={styles.nameCell}>{todo.name}</td>
-                  <td>
-                    <span className={`${styles.statusBadge} ${styles[status]}`}>
-                      {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`${styles.activeBadge} ${todo.included ? styles.activeTrue : styles.activeFalse}`}>
-                      {todo.included ? '🟢 Included' : '⚫ Excluded'}
-                    </span>
-                  </td>
-                  <td className={styles.dateCell}>
-                    {new Date(todo.includedAt).toLocaleString()}
-                  </td>
-                  <td className={styles.dateCell}>
-                    {new Date(todo.deadline).toLocaleString()}
-                  </td>
-                  <td className={styles.actions}>
-                    <button
-                      onClick={() => handleCompleteTodo(todo.id, todo.completed)}
-                      className={todo.completed ? styles.undoButton : styles.completeButton}
-                      title={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
-                    >
-                      {todo.completed ? '↶ Undo' : '✓ Complete'}
-                    </button>
-                    <button
-                      onClick={() => openEditModal(todo)}
-                      className={styles.editButton}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTodo(todo.id)}
-                      className={styles.deleteButton}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                <>
+                  <tr key={todo.id} className={!todo.included ? styles.inactiveRow : ''}>
+                    <td className={styles.nameCell}>{todo.name}</td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${styles[status]}`}>
+                        {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
+                      </span>
+                    </td>
+                    <td className={styles.dateCell}>
+                      {new Date(todo.deadline).toLocaleString()}
+                    </td>
+                    <td className={styles.actions}>
+                      <button
+                        onClick={() => setExpandedRowId(isExpanded ? null : todo.id)}
+                        className={styles.viewButton}
+                        title="View all details"
+                      >
+                        {isExpanded ? '▼ Hide' : '▶ View'}
+                      </button>
+                      <button
+                        onClick={() => handleCompleteTodo(todo.id, todo.completed)}
+                        className={todo.completed ? styles.undoButton : styles.completeButton}
+                        title={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
+                      >
+                        {todo.completed ? '↶ Undo' : '✓ Complete'}
+                      </button>
+                      <button
+                        onClick={() => handleToggleIncluded(todo.id, todo.included)}
+                        className={todo.included ? styles.excludeButton : styles.includeButton}
+                        title={todo.included ? 'Exclude from active' : 'Include in active'}
+                      >
+                        {todo.included ? '⚫ Exclude' : '🟢 Include'}
+                      </button>
+                      <button
+                        onClick={() => openEditModal(todo)}
+                        className={styles.editButton}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTodo(todo.id)}
+                        className={styles.deleteButton}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr key={`${todo.id}-details`} className={styles.expandedRow}>
+                      <td colSpan={4} className={styles.expandedCell}>
+                        <div className={styles.detailsContainer}>
+                          <h3 className={styles.detailsTitle}>Todo Details</h3>
+                          <div className={styles.detailsGrid}>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>ID:</span>
+                              <span className={styles.detailValue}>{todo.id}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Name:</span>
+                              <span className={styles.detailValue}>{todo.name}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Status:</span>
+                              <span className={styles.detailValue}>
+                                <span className={`${styles.statusBadge} ${styles[status]}`}>
+                                  {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
+                                </span>
+                              </span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Completed:</span>
+                              <span className={styles.detailValue}>{todo.completed ? '✅ Yes' : '❌ No'}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Included:</span>
+                              <span className={styles.detailValue}>{todo.included ? '🟢 Yes' : '⚫ No'}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Deadline:</span>
+                              <span className={styles.detailValue}>{new Date(todo.deadline).toLocaleString()}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Included At:</span>
+                              <span className={styles.detailValue}>{new Date(todo.includedAt).toLocaleString()}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Created At:</span>
+                              <span className={styles.detailValue}>{new Date(todo.createdAt).toLocaleString()}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>Updated At:</span>
+                              <span className={styles.detailValue}>{new Date(todo.updatedAt).toLocaleString()}</span>
+                            </div>
+                            <div className={styles.detailItem}>
+                              <span className={styles.detailLabel}>User ID:</span>
+                              <span className={styles.detailValue}>{todo.userId}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               );
             })}
           </tbody>
