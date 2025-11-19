@@ -1,38 +1,33 @@
 .header {
-  background: #fff;
-  border-bottom: 1px solid #e1e5e9;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1rem 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .container {
-.titleLink {
-  text-decoration: none;
-  color: inherit;
-  transition: opacity 0.2s ease;
-}
-
-.titleLink:hover {
-  opacity: 0.8;
-}
-
-.titleLink:hover .title {
-  color: #4299e1;
-}
-
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.titleLink {
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.titleLink:hover {
+  opacity: 0.9;
+}
+
 .title {
   margin: 0;
   font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: white;
+  transition: opacity 0.2s;
 }
 
 .loading {
@@ -46,51 +41,45 @@
   gap: 1rem;
 }
 
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .avatar {
   border-radius: 50%;
-  border: 2px solid #e1e5e9;
+  border: 2px solid white;
 }
 
 .userName {
-  font-size: 0.9rem;
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
-.signInButton,
-.signOutButton {
-  padding: 0.5rem 1rem;
+.signOutButton,
+.signInButton {
+  padding: 0.5rem 1.25rem;
   border: none;
   border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.signInButton {
-  background: #4285f4;
-  color: white;
-}
-
-.signInButton:hover {
-  background: #3367d6;
-  transform: translateY(-1px);
+  transition: all 0.2s;
 }
 
 .signOutButton {
-  background: #f8f9fa;
-  color: #333;
-  border: 1px solid #dadce0;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
 }
 
 .signOutButton:hover {
-  background: #e8eaed;
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
+
+.signInButton {
+  background: white;
+  color: #667eea;
+}
+
+.signInButton:hover {
+  background: #f7fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+

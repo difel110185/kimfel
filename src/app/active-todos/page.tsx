@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { getAllTodos } from '@/lib/todoStore';
+import { getAllTodos, updateTodo } from '@/lib/todoStore';
 import { Todo, calculateTodoStatus } from '@/types/todo';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -12,6 +12,8 @@ export default function ActiveTodosPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [completingId, setCompletingId] = useState<string | null>(null);
 
   const fetchTodos = async () => {
     if (!user) return;
@@ -26,6 +28,27 @@ export default function ActiveTodosPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCompleteTodo = async (todoId: string) => {
+    if (!user) return;
+    try {
+      setCompletingId(todoId);
+      const updatedTodo = await updateTodo(todoId, user.uid, { completed: true });
+      if (updatedTodo) {
+        setTodos(todos.map(todo => todo.id === todoId ? updatedTodo : todo));
+        setExpandedId(null);
+      }
+    } catch (err) {
+      setError('Failed to complete todo');
+      console.error(err);
+    } finally {
+      setCompletingId(null);
+    }
+  };
+
+  const toggleTodoExpanded = (todoId: string) => {
+    setExpandedId(expandedId === todoId ? null : todoId);
   };
 
   useEffect(() => {
@@ -104,53 +127,98 @@ export default function ActiveTodosPage() {
             const now = new Date();
             const deadline = new Date(todo.deadline);
             const isOverdue = deadline < now && !todo.completed;
-            const isToday = deadline.toDateString() === now.toDateString();
+            const isToday = deadline.toDateString() === now.toDateString() && !todo.completed;
+            const isCompleted = todo.completed;
+            const isExpanded = expandedId === todo.id;
+
+            // Determine background class based on priority
+            let colorClass = '';
+            if (isCompleted) {
+              colorClass = styles.completed;
+            } else if (isOverdue) {
+              colorClass = styles.overdue;
+            } else if (isToday) {
+              colorClass = styles.today;
+            }
 
             return (
               <div
                 key={todo.id}
-                className={`${styles.todoCard} ${isOverdue ? styles.overdue : ''} ${isToday ? styles.today : ''}`}
+                className={`${styles.todoCard} ${colorClass} ${isExpanded ? styles.expanded : ''}`}
               >
-                <div className={styles.todoHeader}>
-                  <h3 className={styles.todoName}>{todo.name}</h3>
-                  <span className={`${styles.statusBadge} ${styles[status]}`}>
-                    {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
-                  </span>
+                <div
+                  className={styles.todoHeader}
+                  onClick={() => toggleTodoExpanded(todo.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && toggleTodoExpanded(todo.id)}
+                >
+                  <div className={styles.todoTitleRow}>
+                    <h3 className={styles.todoName}>{todo.name}</h3>
+                    <div className={styles.headerRight}>
+                      {(isOverdue || isToday) && (
+                        <span className={styles.quickIndicator}>
+                          {isOverdue ? '⏰' : '🎯'}
+                        </span>
+                      )}
+                      <span className={styles.expandIcon}>
+                        {isExpanded ? '▼' : '▶'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className={styles.todoDetails}>
-                  <div className={styles.detailRow}>
-                    <span className={styles.label}>Deadline:</span>
-                    <span className={styles.value}>
-                      {deadline.toLocaleDateString()} at {deadline.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-
-                  <div className={styles.detailRow}>
-                    <span className={styles.label}>Included At:</span>
-                    <span className={styles.value}>
-                      {new Date(todo.includedAt).toLocaleDateString()} at {new Date(todo.includedAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-
-                  {isOverdue && (
-                    <div className={styles.overdueWarning}>
-                      ⚠️ This todo is overdue
+                {isExpanded && (
+                  <div className={styles.todoDetails}>
+                    <div className={styles.statusRow}>
+                      <span className={`${styles.statusBadge} ${styles[status]}`}>
+                        {status === 'completed' ? '✅' : status === 'late' ? '⏰' : '📋'} {status}
+                      </span>
                     </div>
-                  )}
 
-                  {isToday && !isOverdue && (
-                    <div className={styles.todayNotice}>
-                      🎯 Due today
+                    <div className={styles.detailRow}>
+                      <span className={styles.label}>Deadline:</span>
+                      <span className={styles.value}>
+                        {deadline.toLocaleDateString()} at {deadline.toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
                     </div>
-                  )}
-                </div>
+
+                    <div className={styles.detailRow}>
+                      <span className={styles.label}>Included At:</span>
+                      <span className={styles.value}>
+                        {new Date(todo.includedAt).toLocaleDateString()} at {new Date(todo.includedAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+
+                    {isOverdue && (
+                      <div className={styles.overdueWarning}>
+                        ⚠️ This todo is overdue
+                      </div>
+                    )}
+
+                    {isToday && !isOverdue && (
+                      <div className={styles.todayNotice}>
+                        🎯 Due today
+                      </div>
+                    )}
+
+                    {!todo.completed && (
+                      <button
+                        onClick={() => handleCompleteTodo(todo.id)}
+                        disabled={completingId === todo.id}
+                        className={styles.completeButton}
+                      >
+                        {completingId === todo.id ? '⏳ Completing...' : '✓ Mark as Complete'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
