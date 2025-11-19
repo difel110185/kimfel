@@ -73,8 +73,12 @@ export const getTodoById = async (id: string, userId: string): Promise<Todo | nu
   }
 };
 
-export const createTodo = async (name: string, deadline: Date, userId: string, completed: boolean = false, included: boolean = true, includedAt?: Date): Promise<Todo> => {
+export const createTodo = async (name: string, deadline: Date, userId?: string, completed: boolean = false, included: boolean = true, includedAt?: Date): Promise<Todo> => {
   try {
+    if (!userId) {
+      throw new Error('User ID is required to create a todo');
+    }
+
     const newTodo = {
       name,
       completed,

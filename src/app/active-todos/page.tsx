@@ -86,6 +86,7 @@ export default function ActiveTodosPage() {
       setLoading(false);
       setTodos([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   // Filter included todos and sort by deadline ASC
@@ -130,7 +131,7 @@ export default function ActiveTodosPage() {
       {includedTodos.length === 0 ? (
         <div className={styles.emptyState}>
           <h3>No Active Todos</h3>
-          <p>You don't have any active todos at the moment.</p>
+          <p>You don&apos;t have any active todos at the moment.</p>
           <Link href="/todos" className={styles.createLink}>
             Go to All Todos →
           </Link>

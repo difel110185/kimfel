@@ -61,6 +61,7 @@ export default function TodosPage() {
       setLoading(false);
       setTodos([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   // Filter and sort todos with calculated status - MOVED BEFORE EARLY RETURNS
@@ -120,7 +121,7 @@ export default function TodosPage() {
 
   const handleAddTodo = async (name: string, deadline: Date) => {
     try {
-      await createTodo(name, deadline, user.uid, false, true, new Date());
+      await createTodo(name, deadline, user?.uid, false, true, new Date());
       await fetchTodos();
     } catch (err) {
       setError('Failed to create todo');
